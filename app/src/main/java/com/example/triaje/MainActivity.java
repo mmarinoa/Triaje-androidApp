@@ -1,5 +1,6 @@
 package com.example.triaje;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        //engancharlo con su layout
         setContentView(R.layout.activity_main);
 
         // 2. Vincular con el XML mediante los IDs
@@ -30,16 +32,23 @@ public class MainActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 // Capturar el texto de los inputs
                 String dni = etDni.getText().toString();
                 String email = etEmail.getText().toString();
                 String pass = etPassword.getText().toString();
 
-                // Ejemplo rápido: mostrar un mensaje con el DNI
-                if (!dni.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "DNI: " + dni, Toast.LENGTH_SHORT).show();
+                // Validación básica (ejemplo: que no estén vacíos)
+                if (!dni.isEmpty() && !pass.isEmpty()) {
+                    // --- AQUÍ OCURRE LA MAGIA DEL SALTO ---
+                    Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    // Opcional: Pasar el DNI a la siguiente pantalla
+                    intent.putExtra("USER_DNI", dni);
+                    startActivity(intent);
+                    // Cerrar la pantalla de login para que no se pueda volver atrás con el botón del móvil
+                    finish();
                 } else {
-                    etDni.setError("Campo obligatorio");
+                    Toast.makeText(MainActivity.this, "Por favor, rellena los campos", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -21,13 +21,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <!-- Nota: Cambia "ic_launcher_background" por el nombre de tu imagen en la carpeta res/drawable -->
 
     <TextView
         android:id="@+id/tv_welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="75dp"
         android:text="Bienvenido"
         android:textColor="#1A1C1E"
         android:textSize="28sp"
