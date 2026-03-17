@@ -12,7 +12,7 @@ import com.google.android.material.textfield.TextInputEditText;
 public class MainActivity extends AppCompatActivity {
 
     // 1. Declarar las variables de la interfaz
-    private TextInputEditText etDni, etEmail, etPassword;
+    private TextInputEditText etDni, etName, etPassword;
     private MaterialButton btnLogin;
 
     @Override
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 2. Vincular con el XML mediante los IDs
         etDni = findViewById(R.id.et_dni);
-        etEmail = findViewById(R.id.et_email);
+        etName = findViewById(R.id.et_name);
         etPassword = findViewById(R.id.et_password);
         btnLogin = findViewById(R.id.btn_login);
 
@@ -35,15 +35,15 @@ public class MainActivity extends AppCompatActivity {
 
                 // Capturar el texto de los inputs
                 String dni = etDni.getText().toString();
-                String email = etEmail.getText().toString();
+                String name = etName.getText().toString();
                 String pass = etPassword.getText().toString();
 
                 // Validación básica (ejemplo: que no estén vacíos)
                 if (!dni.isEmpty() && !pass.isEmpty()) {
                     // --- AQUÍ OCURRE LA MAGIA DEL SALTO ---
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                    // Opcional: Pasar el DNI a la siguiente pantalla
-                    intent.putExtra("USER_DNI", dni);
+                    // Opcional: Pasar el nombre a la siguiente pantalla
+                    intent.putExtra("USER_NAME", name);
                     startActivity(intent);
                     // Cerrar la pantalla de login para que no se pueda volver atrás con el botón del móvil
                     finish();
