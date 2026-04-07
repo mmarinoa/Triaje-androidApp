@@ -9,12 +9,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class HomeActivity extends AppCompatActivity {
+
+    private TextInputLayout tilHomeName;
+    private TextInputLayout tilHomeDni;
+    private TextInputLayout tilHomeReason;
 
     private TextInputEditText etHomeName;
     private TextInputEditText etHomeDni;
     private TextInputEditText etHomeReason;
+
     private MaterialButton btnSendDoctor;
 
     @Override
@@ -28,9 +34,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        tilHomeName = findViewById(R.id.til_home_name);
+        tilHomeDni = findViewById(R.id.til_home_dni);
+        tilHomeReason = findViewById(R.id.til_home_reason);
+
         etHomeName = findViewById(R.id.et_home_name);
         etHomeDni = findViewById(R.id.et_home_dni);
         etHomeReason = findViewById(R.id.et_home_reason);
+
         btnSendDoctor = findViewById(R.id.btn_send_doctor);
     }
 
@@ -61,39 +72,38 @@ public class HomeActivity extends AppCompatActivity {
         String reason = getText(etHomeReason);
 
         if (TextUtils.isEmpty(name)) {
-            etHomeName.setError("Introduce tu nombre completo");
+            tilHomeName.setError("Introduce tu nombre completo");
             etHomeName.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(dni)) {
-            etHomeDni.setError("Introduce tu DNI / NIE");
+            tilHomeDni.setError("Introduce tu DNI / NIE");
             etHomeDni.requestFocus();
             return;
         }
 
         if (!validarFormatoDNI(dni)) {
-            etHomeDni.setError("El DNI debe tener 8 números y una letra");
+            tilHomeDni.setError("El DNI debe tener 8 números y una letra");
             etHomeDni.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(reason)) {
-            etHomeReason.setError("Introduce el motivo de la consulta");
+            tilHomeReason.setError("Introduce el motivo de la consulta");
             etHomeReason.requestFocus();
             return;
         }
 
         Toast.makeText(this, "Consulta enviada correctamente", Toast.LENGTH_SHORT).show();
 
-        // Aquí iría después tu envío al webhook de n8n
-        // enviarConsulta(name, dni, reason);
+        // Aquí podrás conectar con n8n --> enviar el webhook para coger todos los datos
     }
 
     private void clearErrors() {
-        etHomeName.setError(null);
-        etHomeDni.setError(null);
-        etHomeReason.setError(null);
+        tilHomeName.setError(null);
+        tilHomeDni.setError(null);
+        tilHomeReason.setError(null);
     }
 
     private String getText(TextInputEditText editText) {
