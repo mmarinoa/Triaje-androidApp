@@ -36,17 +36,135 @@ El sistema completo está formado por varias partes:
 - Panel web para el personal médico.
 - Base de datos para almacenar pacientes, consultas y resultados del triaje.
 
-Flujo general del sistema:
+---
 
-```text
-Paciente
-   ↓
-Aplicación Android
-   ↓
-Backend Django
-   ↓
-Flujo n8n con IA
-   ↓
-Clasificación por prioridad
-   ↓
-Panel web del médico
+## 🔄 Flujo general del sistema
+
+Paciente  
+↓  
+Aplicación Android  
+↓  
+Backend Django  
+↓  
+Flujo n8n con IA  
+↓  
+Clasificación por prioridad  
+↓  
+Panel web del médico  
+
+---
+
+## ✨ Funcionalidades principales
+
+- Registro de pacientes.
+- Pantalla de inicio de sesión.
+- Validación de datos introducidos por el usuario.
+- Formulario para indicar el motivo de la consulta.
+- Envío de información al backend.
+- Diseño orientado a un flujo de urgencias médicas.
+- Interfaz pensada para introducir la información de forma rápida.
+- Integración prevista con sistema de triaje mediante IA.
+
+---
+
+## 🧠 Triaje asistido por inteligencia artificial
+
+La aplicación recoge la información del paciente y el motivo de la consulta.
+
+Posteriormente, estos datos se envían al backend, donde pueden ser procesados por un flujo de automatización conectado a un modelo de inteligencia artificial. Este flujo analiza la información recibida y clasifica el caso según criterios de prioridad.
+
+El objetivo no es sustituir al personal sanitario, sino ofrecer una herramienta de apoyo que ayude a ordenar la información y agilizar la toma de decisiones.
+
+---
+
+## 🛠️ Tecnologías utilizadas
+
+- **Java**
+- **Android Studio**
+- **Gradle**
+- **XML Layouts**
+- **Integración con APIs REST**
+- **Django**
+- **n8n**
+- **Inteligencia Artificial**
+- **Base de datos SQL**
+
+---
+
+## 📁 Estructura del proyecto
+
+Triaje-androidApp/  
+├── app/  
+│   └── src/  
+│       └── main/  
+│           ├── java/  
+│           ├── res/  
+│           └── AndroidManifest.xml  
+├── gradle/  
+├── .gitignore  
+├── build.gradle  
+├── gradle.properties  
+├── gradlew  
+├── gradlew.bat  
+├── settings.gradle  
+└── README.md  
+
+---
+
+## 📱 Pantallas principales
+
+La aplicación incluye pantallas centradas en la interacción del paciente con el sistema.
+
+Pantallas principales:
+
+- Pantalla de login.
+- Pantalla de registro.
+- Pantalla principal.
+- Formulario de motivo de consulta.
+- Validaciones de campos.
+- Flujo de envío de datos al sistema.
+
+---
+
+## 🔐 Datos y privacidad
+
+Este proyecto está desarrollado como prototipo académico y técnico.
+
+No se deben almacenar datos reales de pacientes en este repositorio.
+
+La información sensible, como URLs privadas, claves de API, tokens, credenciales o datos médicos, debe mantenerse siempre fuera del código fuente público.
+
+Para ello, se recomienda utilizar:
+
+- `local.properties`
+- variables de entorno
+- archivos de configuración ignorados por Git
+- `BuildConfig`
+
+No se deben subir a GitHub:
+
+- claves API
+- tokens
+- credenciales
+- URLs privadas
+- datos médicos reales
+- información personal de pacientes
+
+---
+
+## ⚙️ Instalación y ejecución
+
+### Requisitos
+
+- Android Studio
+- JDK compatible
+- Gradle
+- Android SDK
+- Emulador Android o dispositivo físico
+
+### Pasos
+
+Clonar el repositorio:
+
+```bash
+git clone https://github.com/mmarinoa/Triaje-androidApp.git
