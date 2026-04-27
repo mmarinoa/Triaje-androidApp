@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Triaje</string>
+    <string name="hint_dni">DNI / NIE</string>
+    <string name="hint_name">Nombre completo</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="button_login">ENTRAR</string>
 </resources>
