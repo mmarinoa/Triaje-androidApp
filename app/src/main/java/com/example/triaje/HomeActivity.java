@@ -3,6 +3,7 @@ package com.example.triaje;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,15 +14,19 @@ import com.google.android.material.textfield.TextInputLayout;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private TextInputLayout tilHomeName;
-    private TextInputLayout tilHomeDni;
-    private TextInputLayout tilHomeReason;
+    private int pacienteId = -1;
+    private String userName = "";
+    private String userDni = "";
+    private String userEmail = "";
 
-    private TextInputEditText etHomeName;
-    private TextInputEditText etHomeDni;
+    private TextView tvWelcome;
+    private TextView tvPatientInfo;
+
+    private TextInputLayout tilHomeReason;
     private TextInputEditText etHomeReason;
 
     private MaterialButton btnSendDoctor;
+    private MaterialButton btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,60 +39,56 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        tilHomeName = findViewById(R.id.til_home_name);
-        tilHomeDni = findViewById(R.id.til_home_dni);
-        tilHomeReason = findViewById(R.id.til_home_reason);
+        tvWelcome = findViewById(R.id.tv_welcome);
+        tvPatientInfo = findViewById(R.id.tv_patient_info);
 
-        etHomeName = findViewById(R.id.et_home_name);
-        etHomeDni = findViewById(R.id.et_home_dni);
+        tilHomeReason = findViewById(R.id.til_home_reason);
         etHomeReason = findViewById(R.id.et_home_reason);
 
         btnSendDoctor = findViewById(R.id.btn_send_doctor);
+        btnLogout = findViewById(R.id.btn_logout);
     }
 
     private void loadUserData() {
         Intent intent = getIntent();
 
-        String userName = intent.getStringExtra("USER_NAME");
-        String userDni = intent.getStringExtra("USER_DNI");
+        pacienteId = intent.getIntExtra("PACIENTE_ID", -1);
+        userName = intent.getStringExtra("USER_NAME");
+        userDni = intent.getStringExtra("USER_DNI");
+        userEmail = intent.getStringExtra("USER_EMAIL");
 
-        if (userName != null && !userName.isEmpty()) {
-            etHomeName.setText(userName);
+        if (userName == null || userName.trim().isEmpty()) {
+            userName = "Paciente";
         }
 
-        if (userDni != null && !userDni.isEmpty()) {
-            etHomeDni.setText(userDni);
+        if (userDni == null) {
+            userDni = "";
         }
+
+        if (userEmail == null) {
+            userEmail = "";
+        }
+
+        tvWelcome.setText("Hola, " + userName);
+
+        String patientInfo = "DNI: " + userDni;
+
+        if (!userEmail.isEmpty()) {
+            patientInfo += "\nEmail: " + userEmail;
+        }
+
+        tvPatientInfo.setText(patientInfo);
     }
 
     private void setupListeners() {
-        btnSendDoctor.setOnClickListener(v -> validateAndSend());
+        btnSendDoctor.setOnClickListener(view -> validateAndSend());
+        btnLogout.setOnClickListener(view -> logout());
     }
 
     private void validateAndSend() {
         clearErrors();
 
-        String name = getText(etHomeName);
-        String dni = getText(etHomeDni);
         String reason = getText(etHomeReason);
-
-        if (TextUtils.isEmpty(name)) {
-            tilHomeName.setError("Introduce tu nombre completo");
-            etHomeName.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(dni)) {
-            tilHomeDni.setError("Introduce tu DNI / NIE");
-            etHomeDni.requestFocus();
-            return;
-        }
-
-        if (!validarFormatoDNI(dni)) {
-            tilHomeDni.setError("El DNI debe tener 8 números y una letra");
-            etHomeDni.requestFocus();
-            return;
-        }
 
         if (TextUtils.isEmpty(reason)) {
             tilHomeReason.setError("Introduce el motivo de la consulta");
@@ -95,14 +96,31 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(this, "Consulta enviada correctamente", Toast.LENGTH_SHORT).show();
+        if (pacienteId == -1) {
+            Toast.makeText(
+                    this,
+                    "No se pudo identificar al paciente. Inicia sesión de nuevo.",
+                    Toast.LENGTH_LONG
+            ).show();
+            return;
+        }
 
-        // Aquí podrás conectar con n8n --> enviar el webhook para coger todos los datos
+        Toast.makeText(this, "Pantalla preparada. Falta conectar envío de consulta.", Toast.LENGTH_SHORT).show();
+
+        /*
+         * Siguiente paso:
+         * Aquí llamaremos a Django para crear la consulta real.
+         */
+    }
+
+    private void logout() {
+        Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void clearErrors() {
-        tilHomeName.setError(null);
-        tilHomeDni.setError(null);
         tilHomeReason.setError(null);
     }
 
@@ -110,12 +128,7 @@ public class HomeActivity extends AppCompatActivity {
         if (editText.getText() == null) {
             return "";
         }
+
         return editText.getText().toString().trim();
     }
-
-    private boolean validarFormatoDNI(String dni) {
-        String regexDNI = "^[0-9]{8}[A-Za-z]$";
-        return dni.matches(regexDNI);
-    }
-
 }
