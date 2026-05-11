@@ -177,6 +177,29 @@ public class HomeActivity extends AppCompatActivity {
                     String message = response.optString("message", "Consulta creada correctamente");
                     Toast.makeText(HomeActivity.this, message, Toast.LENGTH_LONG).show();
 
+                    JSONObject consulta = response.optJSONObject("consulta");
+
+                    if (consulta == null) {
+                        etHomeReason.setText("");
+                        return;
+                    }
+
+                    int consultaId = consulta.optInt("id", -1);
+                    String motivo = consulta.optString("motivo", "");
+                    String estado = consulta.optString("estado", "pendiente");
+                    String categoria = consulta.optString("categoria", "");
+                    int prioridadIa = consulta.optInt("prioridad_ia", -1);
+                    String fechaCreacion = consulta.optString("fecha_creacion", "");
+
+                    Intent intent = new Intent(HomeActivity.this, DetalleConsultaActivity.class);
+                    intent.putExtra("CONSULTA_ID", consultaId);
+                    intent.putExtra("CONSULTA_MOTIVO", motivo);
+                    intent.putExtra("CONSULTA_ESTADO", estado);
+                    intent.putExtra("CONSULTA_CATEGORIA", categoria);
+                    intent.putExtra("CONSULTA_PRIORIDAD_IA", prioridadIa);
+                    intent.putExtra("CONSULTA_FECHA_CREACION", fechaCreacion);
+                    startActivity(intent);
+
                     etHomeReason.setText("");
                 },
                 error -> {
