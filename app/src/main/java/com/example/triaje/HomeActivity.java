@@ -8,12 +8,26 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.triaje.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+
 public class HomeActivity extends AppCompatActivity {
+
+    private static final String CONSULTAS_URL = "http://10.0.2.2:8000/api/consultas/";
 
     private int pacienteId = -1;
     private String userName = "";
@@ -28,6 +42,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private MaterialButton btnSendDoctor;
     private MaterialButton btnLogout;
+
+    private RequestQueue requestQueue;
     private SessionManager sessionManager;
 
     @Override
@@ -35,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        requestQueue = Volley.newRequestQueue(this);
         sessionManager = new SessionManager(this);
 
         initViews();
@@ -56,10 +73,22 @@ public class HomeActivity extends AppCompatActivity {
     private void loadUserData() {
         Intent intent = getIntent();
 
-        pacienteId = intent.getIntExtra("PACIENTE_ID", -1);
+        pacienteId = intent.getIntExtra("PACIENTE_ID", sessionManager.getPacienteId());
         userName = intent.getStringExtra("USER_NAME");
         userDni = intent.getStringExtra("USER_DNI");
         userEmail = intent.getStringExtra("USER_EMAIL");
+
+        if (userName == null || userName.trim().isEmpty()) {
+            userName = sessionManager.getUserName();
+        }
+
+        if (userDni == null || userDni.trim().isEmpty()) {
+            userDni = sessionManager.getUserDni();
+        }
+
+        if (userEmail == null || userEmail.trim().isEmpty()) {
+            userEmail = sessionManager.getUserEmail();
+        }
 
         if (userName == null || userName.trim().isEmpty()) {
             userName = "Paciente";
@@ -109,12 +138,97 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(this, "Pantalla preparada. Falta conectar envío de consulta.", Toast.LENGTH_SHORT).show();
+        String accessToken = sessionManager.getAccessToken();
 
-        /*
-         * Siguiente paso:
-         * Aquí llamaremos a Django para crear la consulta real.
-         */
+        if (accessToken.isEmpty()) {
+            Toast.makeText(
+                    this,
+                    "Sesión caducada o no iniciada. Inicia sesión de nuevo.",
+                    Toast.LENGTH_LONG
+            ).show();
+            logout();
+            return;
+        }
+
+        createConsultation(reason, accessToken);
+    }
+
+    private void createConsultation(String reason, String accessToken) {
+        btnSendDoctor.setEnabled(false);
+        btnSendDoctor.setText("Enviando...");
+
+        JSONObject body = new JSONObject();
+
+        try {
+            body.put("motivo", reason);
+        } catch (JSONException exception) {
+            resetSendButton();
+            Toast.makeText(this, "Error preparando la consulta", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                CONSULTAS_URL,
+                body,
+                response -> {
+                    resetSendButton();
+
+                    String message = response.optString("message", "Consulta creada correctamente");
+                    Toast.makeText(HomeActivity.this, message, Toast.LENGTH_LONG).show();
+
+                    etHomeReason.setText("");
+                },
+                error -> {
+                    resetSendButton();
+
+                    String errorMessage = getVolleyErrorMessage(error.networkResponse);
+                    Toast.makeText(HomeActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        logout();
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + accessToken);
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        requestQueue.add(request);
+    }
+
+    private String getVolleyErrorMessage(NetworkResponse networkResponse) {
+        if (networkResponse == null || networkResponse.data == null) {
+            return "No se pudo conectar con el servidor. Comprueba que Django está encendido.";
+        }
+
+        try {
+            String responseBody = new String(networkResponse.data, StandardCharsets.UTF_8);
+            JSONObject jsonObject = new JSONObject(responseBody);
+
+            if (jsonObject.has("error")) {
+                return jsonObject.getString("error");
+            }
+
+            if (jsonObject.has("errors")) {
+                return jsonObject.getJSONObject("errors").toString();
+            }
+
+            return "Error al enviar la consulta.";
+
+        } catch (Exception exception) {
+            return "Error al enviar la consulta.";
+        }
+    }
+
+    private void resetSendButton() {
+        btnSendDoctor.setEnabled(true);
+        btnSendDoctor.setText("Enviar consulta");
     }
 
     private void logout() {
