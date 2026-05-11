@@ -13,8 +13,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.triaje.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+
 
 import org.json.JSONObject;
 
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnLogin;
     private RequestQueue requestQueue;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         requestQueue = Volley.newRequestQueue(this);
+        sessionManager = new SessionManager(this);
 
         etEmail = findViewById(R.id.et_email);
         etPassword = findViewById(R.id.et_password);
@@ -122,6 +126,23 @@ public class MainActivity extends AppCompatActivity {
                     String nombreCompleto = paciente.optString("nombre_completo", "");
                     String dni = paciente.optString("dni", "");
                     String pacienteEmail = paciente.optString("email", email);
+
+                    String accessToken = response.optString("access", "");
+                    String refreshToken = response.optString("refresh", "");
+
+                    if (accessToken.isEmpty() || refreshToken.isEmpty()) {
+                        Toast.makeText(MainActivity.this, "No se recibieron los tokens de sesión", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    sessionManager.saveSession(
+                            accessToken,
+                            refreshToken,
+                            pacienteId,
+                            nombreCompleto,
+                            dni,
+                            pacienteEmail
+                    );
 
                     Toast.makeText(MainActivity.this, "Login correcto", Toast.LENGTH_SHORT).show();
 

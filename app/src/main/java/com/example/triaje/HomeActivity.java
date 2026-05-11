@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.triaje.session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -27,11 +28,14 @@ public class HomeActivity extends AppCompatActivity {
 
     private MaterialButton btnSendDoctor;
     private MaterialButton btnLogout;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        sessionManager = new SessionManager(this);
 
         initViews();
         loadUserData();
@@ -114,6 +118,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void logout() {
+        sessionManager.clearSession();
+
         Intent intent = new Intent(HomeActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
