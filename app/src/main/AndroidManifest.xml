@@ -27,6 +27,7 @@
         <activity android:name=".HomeActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".DetalleConsultaActivity" />
+        <activity android:name=".EditarConsultaActivity" />
 
     </application>
 

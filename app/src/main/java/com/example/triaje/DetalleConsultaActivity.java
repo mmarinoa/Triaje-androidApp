@@ -37,8 +37,11 @@ public class DetalleConsultaActivity extends AppCompatActivity {
     private MaterialButton btnActualizarEstado;
     private MaterialButton btnVolver;
 
+    private String motivoActual = "";
+    private MaterialButton btnModificarConsulta;
     private RequestQueue requestQueue;
     private SessionManager sessionManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
 
         btnActualizarEstado = findViewById(R.id.btn_actualizar_estado);
         btnVolver = findViewById(R.id.btn_volver_home);
+        btnModificarConsulta = findViewById(R.id.btn_modificar_consulta);
     }
 
     private void loadConsultaDataFromIntent() {
@@ -86,6 +90,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
 
     private void setupListeners() {
         btnActualizarEstado.setOnClickListener(view -> refreshConsulta());
+        btnModificarConsulta.setOnClickListener(view -> openEditarConsulta());
         btnVolver.setOnClickListener(view -> finish());
     }
 
@@ -172,6 +177,8 @@ public class DetalleConsultaActivity extends AppCompatActivity {
             motivo = "No disponible";
         }
 
+        motivoActual = motivo;
+
         if (estado == null || estado.trim().isEmpty()) {
             estado = "pendiente";
         }
@@ -256,5 +263,17 @@ public class DetalleConsultaActivity extends AppCompatActivity {
             default:
                 return estado;
         }
+    }
+
+    private void openEditarConsulta() {
+        if (consultaId == -1) {
+            Toast.makeText(this, "No se pudo identificar la consulta.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        Intent intent = new Intent(DetalleConsultaActivity.this, EditarConsultaActivity.class);
+        intent.putExtra("CONSULTA_ID", consultaId);
+        intent.putExtra("CONSULTA_MOTIVO", motivoActual);
+        startActivity(intent);
     }
 }
