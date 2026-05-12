@@ -6,6 +6,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
@@ -41,6 +43,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
     private MaterialButton btnModificarConsulta;
     private RequestQueue requestQueue;
     private SessionManager sessionManager;
+    private ActivityResultLauncher<Intent> editarConsultaLauncher;
 
 
     @Override
@@ -50,6 +53,8 @@ public class DetalleConsultaActivity extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(this);
         sessionManager = new SessionManager(this);
+
+        setupEditarConsultaLauncher();
 
         initViews();
         loadConsultaDataFromIntent();
@@ -274,6 +279,37 @@ public class DetalleConsultaActivity extends AppCompatActivity {
         Intent intent = new Intent(DetalleConsultaActivity.this, EditarConsultaActivity.class);
         intent.putExtra("CONSULTA_ID", consultaId);
         intent.putExtra("CONSULTA_MOTIVO", motivoActual);
-        startActivity(intent);
+        editarConsultaLauncher.launch(intent);
+    }
+
+    private void setupEditarConsultaLauncher() {
+        editarConsultaLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+                        return;
+                    }
+
+                    Intent data = result.getData();
+
+                    int updatedConsultaId = data.getIntExtra("CONSULTA_ID", consultaId);
+                    String motivo = data.getStringExtra("CONSULTA_MOTIVO");
+                    String estado = data.getStringExtra("CONSULTA_ESTADO");
+                    String categoria = data.getStringExtra("CONSULTA_CATEGORIA");
+                    int prioridadIa = data.getIntExtra("CONSULTA_PRIORIDAD_IA", -1);
+                    String fechaCreacion = data.getStringExtra("CONSULTA_FECHA_CREACION");
+
+                    consultaId = updatedConsultaId;
+
+                    renderConsultaData(
+                            updatedConsultaId,
+                            motivo,
+                            estado,
+                            categoria,
+                            prioridadIa,
+                            fechaCreacion
+                    );
+                }
+        );
     }
 }
