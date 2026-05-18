@@ -14,6 +14,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.triaje.session.SessionManager;
+import com.example.triaje.config.ApiConfig;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -26,8 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
-
-    private static final String CONSULTAS_URL = "http://10.0.2.2:8000/api/consultas/";
 
     private int pacienteId = -1;
     private String userName = "";
@@ -169,7 +168,7 @@ public class HomeActivity extends AppCompatActivity {
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
-                CONSULTAS_URL,
+                ApiConfig.CONSULTAS_URL,
                 body,
                 response -> {
                     resetSendButton();

@@ -13,6 +13,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.triaje.session.SessionManager;
+import com.example.triaje.config.ApiConfig;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -25,8 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EditarConsultaActivity extends AppCompatActivity {
-
-    private static final String CONSULTAS_BASE_URL = "http://10.0.2.2:8000/api/consultas/";
 
     private int consultaId = -1;
 
@@ -124,7 +123,7 @@ public class EditarConsultaActivity extends AppCompatActivity {
             return;
         }
 
-        String url = CONSULTAS_BASE_URL + consultaId + "/";
+        String url = ApiConfig.getConsultaDetailUrl(consultaId);
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.PUT,

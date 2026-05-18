@@ -15,6 +15,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.example.triaje.config.ApiConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,8 +23,6 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 
 public class RegisterActivity extends AppCompatActivity {
-
-    private static final String REGISTER_URL = "http://10.0.2.2:8000/api/auth/register/";
 
     private TextInputEditText etName, etDni, etEmail, etPassword;
     private MaterialButton btnRegister;
@@ -102,7 +101,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
-                REGISTER_URL,
+                ApiConfig.REGISTER_URL,
                 body,
                 response -> {
                     resetRegisterButton();

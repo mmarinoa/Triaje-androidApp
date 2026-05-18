@@ -16,6 +16,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.triaje.session.SessionManager;
+import com.example.triaje.config.ApiConfig;
 import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONObject;
@@ -25,8 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DetalleConsultaActivity extends AppCompatActivity {
-
-    private static final String CONSULTAS_BASE_URL = "http://10.0.2.2:8000/api/consultas/";
 
     private int consultaId = -1;
 
@@ -120,7 +119,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
         btnActualizarEstado.setEnabled(false);
         btnActualizarEstado.setText("Actualizando...");
 
-        String url = CONSULTAS_BASE_URL + consultaId + "/";
+        String url = ApiConfig.getConsultaDetailUrl(consultaId);
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
@@ -282,7 +281,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
         btnCancelarConsulta.setEnabled(false);
         btnCancelarConsulta.setText("Cancelando...");
 
-        String url = CONSULTAS_BASE_URL + consultaId + "/";
+        String url = ApiConfig.getConsultaDetailUrl(consultaId);
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.DELETE,

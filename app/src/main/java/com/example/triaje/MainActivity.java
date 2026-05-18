@@ -14,6 +14,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.triaje.session.SessionManager;
+import com.example.triaje.config.ApiConfig;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -23,8 +24,6 @@ import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String LOGIN_URL = "http://10.0.2.2:8000/api/auth/login/";
 
     private TextInputEditText etEmail, etPassword;
     private MaterialButton btnLogin;
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.POST,
-                LOGIN_URL,
+                ApiConfig.LOGIN_URL,
                 body,
                 response -> {
                     resetLoginButton();
