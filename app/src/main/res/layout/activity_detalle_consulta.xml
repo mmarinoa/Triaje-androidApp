@@ -82,7 +82,7 @@
             android:id="@+id/tv_consulta_categoria"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="Categoría: Pendiente de clasificar"
             android:textColor="#1A1C1E"
             android:textSize="16sp" />
@@ -91,7 +91,7 @@
             android:id="@+id/tv_consulta_prioridad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="Prioridad IA: Pendiente de clasificar"
             android:textColor="#1A1C1E"
             android:textSize="16sp" />
@@ -100,7 +100,7 @@
             android:id="@+id/tv_consulta_fecha"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="Fecha de creación:"
             android:textColor="#5F6368"
             android:textSize="14sp" />
@@ -133,6 +133,18 @@
             android:textColor="@android:color/white"
             app:backgroundTint="#FF9800"
             app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancelar_consulta"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="12dp"
+            android:text="Cancelar consulta"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="12dp"
+            app:backgroundTint="#FF0000"
+            app:strokeColor="#D32F2F"
+            app:strokeWidth="1dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_volver_home"

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.activity.result.ActivityResultLauncher;
@@ -41,6 +42,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
 
     private String motivoActual = "";
     private MaterialButton btnModificarConsulta;
+    private MaterialButton btnCancelarConsulta;
     private RequestQueue requestQueue;
     private SessionManager sessionManager;
     private ActivityResultLauncher<Intent> editarConsultaLauncher;
@@ -71,6 +73,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
 
         btnActualizarEstado = findViewById(R.id.btn_actualizar_estado);
         btnVolver = findViewById(R.id.btn_volver_home);
+        btnCancelarConsulta = findViewById(R.id.btn_cancelar_consulta);
         btnModificarConsulta = findViewById(R.id.btn_modificar_consulta);
     }
 
@@ -96,6 +99,7 @@ public class DetalleConsultaActivity extends AppCompatActivity {
     private void setupListeners() {
         btnActualizarEstado.setOnClickListener(view -> refreshConsulta());
         btnModificarConsulta.setOnClickListener(view -> openEditarConsulta());
+        btnCancelarConsulta.setOnClickListener(view -> showCancelConfirmation());
         btnVolver.setOnClickListener(view -> finish());
     }
 
@@ -211,6 +215,16 @@ public class DetalleConsultaActivity extends AppCompatActivity {
         tvConsultaCategoria.setText("Categoría: " + categoria);
         tvConsultaPrioridad.setText("Prioridad IA: " + prioridadTexto);
         tvConsultaFecha.setText("Fecha de creación:\n" + fechaCreacion);
+
+        if ("cancelada".equals(estado)) {
+            btnModificarConsulta.setEnabled(false);
+            btnCancelarConsulta.setEnabled(false);
+            btnCancelarConsulta.setText("Consulta cancelada");
+        } else {
+            btnModificarConsulta.setEnabled(true);
+            btnCancelarConsulta.setEnabled(true);
+            btnCancelarConsulta.setText("Cancelar consulta");
+        }
     }
 
     private String getVolleyErrorMessage(NetworkResponse networkResponse) {
@@ -240,6 +254,100 @@ public class DetalleConsultaActivity extends AppCompatActivity {
     private void resetActualizarButton() {
         btnActualizarEstado.setEnabled(true);
         btnActualizarEstado.setText("Actualizar estado");
+    }
+
+    private void showCancelConfirmation() {
+        if (consultaId == -1) {
+            Toast.makeText(this, "No se pudo identificar la consulta.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Cancelar consulta")
+                .setMessage("¿Seguro que quieres cancelar esta consulta?")
+                .setPositiveButton("Sí, cancelar", (dialog, which) -> cancelConsulta())
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void cancelConsulta() {
+        String accessToken = sessionManager.getAccessToken();
+
+        if (accessToken.isEmpty()) {
+            Toast.makeText(this, "Sesión caducada. Inicia sesión de nuevo.", Toast.LENGTH_LONG).show();
+            goToLogin();
+            return;
+        }
+
+        btnCancelarConsulta.setEnabled(false);
+        btnCancelarConsulta.setText("Cancelando...");
+
+        String url = CONSULTAS_BASE_URL + consultaId + "/";
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.DELETE,
+                url,
+                null,
+                response -> {
+                    resetCancelarButton();
+
+                    String message = response.optString("message", "Consulta cancelada correctamente");
+                    Toast.makeText(DetalleConsultaActivity.this, message, Toast.LENGTH_LONG).show();
+
+                    JSONObject consulta = response.optJSONObject("consulta");
+
+                    if (consulta != null) {
+                        int updatedConsultaId = consulta.optInt("id", consultaId);
+                        String motivo = consulta.optString("motivo", motivoActual);
+                        String estado = consulta.optString("estado", "cancelada");
+                        String categoria = consulta.optString("categoria", "");
+                        int prioridadIa = consulta.optInt("prioridad_ia", -1);
+                        String fechaCreacion = consulta.optString("fecha_creacion", "");
+
+                        consultaId = updatedConsultaId;
+
+                        renderConsultaData(
+                                updatedConsultaId,
+                                motivo,
+                                estado,
+                                categoria,
+                                prioridadIa,
+                                fechaCreacion
+                        );
+                    } else {
+                        tvConsultaEstado.setText("Estado: Cancelada");
+                    }
+
+                    btnModificarConsulta.setEnabled(false);
+                    btnCancelarConsulta.setEnabled(false);
+                    btnCancelarConsulta.setText("Consulta cancelada");
+                },
+                error -> {
+                    resetCancelarButton();
+
+                    String errorMessage = getVolleyErrorMessage(error.networkResponse);
+                    Toast.makeText(DetalleConsultaActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        goToLogin();
+                    }
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + accessToken);
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+
+        requestQueue.add(request);
+    }
+
+    private void resetCancelarButton() {
+        btnCancelarConsulta.setEnabled(true);
+        btnCancelarConsulta.setText("Cancelar consulta");
     }
 
     private void goToLogin() {
